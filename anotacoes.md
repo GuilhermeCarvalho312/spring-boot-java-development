@@ -9,3 +9,10 @@ Com o Spring Boot, os desenvolvedores podem criar aplicativos em Java com maior 
 # Anotações Aula 1 - Criação do projeto:
 
 - Para criar o projeto foi utilizado o SpringInitialiazr: https://start.spring.io/
+
+## O que foi feito na Aula - 1:
+
+1. Criar um projeto Spring Boot utilizando o site do Spring Initializr;
+2. Importar o projeto no IntelliJ e executar uma aplicação Spring Boot pela classe contendo o método main;
+3. Criar uma classe Controller e mapear uma URL nela utilizando as anotações @RestController e @RequestMapping;
+4. Realizar uma requisição de teste no browser acessando a URL mapeada no Controller.
