@@ -1,48 +1,45 @@
 package med.voll.api.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import med.voll.api.medico.DadosCadastroMedico;
+import jakarta.validation.Valid;
+import med.voll.api.medico.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("medicos")
 public class MedicoController {
 
-    /**
-     * Cadastra um novo médico com base nos dados recebidos no corpo da solicitação
-     * HTTP POST.
-     * 
-     * @param jsonData um objeto {@link DadosCadastroMedico} contendo as informações
-     *                 do médico a ser cadastrado.
-     * @throws AlgumaExcecao caso ocorra algum erro durante o processamento do
-     *                       cadastro.
-     */
+    @Autowired
+    private MedicoRepository repository;
+
     @PostMapping
-    public void cadastrar(@RequestBody DadosCadastroMedico jsonData) {
-        System.out.println(jsonData);
+    @Transactional
+    public void cadastrar(@RequestBody @Valid DadosCadastroMedico dados) {
+        repository.save(new Medico(dados));
     }
+
+    @GetMapping
+    public Page<DadosListagemMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
+        return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+    }
+
+    @PutMapping
+    @Transactional
+    public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
+        var medico = repository.getReferenceById(dados.id());
+        medico.atualizarInformacoes(dados);
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void excluir(@PathVariable Long id) {
+        var medico = repository.getReferenceById(id);
+        medico.excluir();
+    }
+
+
 }
-
-// Esse código é um exemplo de um controlador (controller) em Spring Boot, que é
-// uma classe responsável por gerenciar as solicitações HTTP recebidas pela
-// aplicação.
-
-// O controlador é definido pela anotação @RestController e mapeado para o
-// caminho /medicos usando a anotação @RequestMapping. Quando um usuário faz uma
-// solicitação POST para esse caminho, a função cadastrar é acionada.
-
-// A anotação @RequestBody indica que o corpo da solicitação HTTP deve ser
-// interpretado como um objeto DadosCadastroMedico, que é uma classe que contém
-// os dados de cadastro de um médico. Essa classe provavelmente tem campos como
-// nome, especialidade, CRM, etc.
-
-// Dentro da função cadastrar, o objeto jsonData contém as informações do médico
-// recebidas no corpo da solicitação. Nesse exemplo, a função simplesmente
-// imprime esses dados no console usando System.out.println(jsonData).
-
-// No geral, esse código define um controlador que pode receber dados de
-// cadastro de médicos enviados via solicitação HTTP POST, e imprimir esses
-// dados no console para fins de depuração.
